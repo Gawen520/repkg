@@ -20,7 +20,7 @@ namespace RePKG.Command
         private static ExtractOptions _options;
         private static string[] _skipExtArray;
         private static string[] _onlyExtArray;
-        private static readonly string[] ProjectFiles = {"project.json"};
+        private static readonly string[] ProjectFiles = { "project.json" };
 
         private static readonly ITexReader _texReader;
         private static readonly ITexJsonInfoGenerator _texJsonInfoGenerator;
@@ -196,10 +196,24 @@ namespace RePKG.Command
             // Get output directory
             string outputDirectory;
             var preview = string.Empty;
-            if (appendFolderName)
+
+            // 如果同时使用了 --osi 和 -n，总是使用项目名称
+            if (_options.OnlySaveImages && _options.UseName)
+            {
+                var name = defaultProjectName;
+                GetProjectInfo(file, ref name, ref preview);
+                outputDirectory = Path.Combine(_options.OutputDirectory, name.GetSafeFilename());
+            }
+            else if (appendFolderName)
+            {
+                // 否则只有在 appendFolderName 为 true 时才使用子文件夹名称
                 GetProjectFolderNameAndPreviewImage(file, defaultProjectName, out outputDirectory, out preview);
+            }
             else
+            {
+                // 直接输出到指定目录
                 outputDirectory = _options.OutputDirectory;
+            }
 
             // Extract package entries
             var entries = FilterEntries(package.Entries);
@@ -240,15 +254,15 @@ namespace RePKG.Command
             if (!string.IsNullOrEmpty(_options.IgnoreExts))
             {
                 return from entry in entries
-                    where !_skipExtArray.Any(s => entry.FullPath.EndsWith(s, StringComparison.OrdinalIgnoreCase))
-                    select entry;
+                       where !_skipExtArray.Any(s => entry.FullPath.EndsWith(s, StringComparison.OrdinalIgnoreCase))
+                       select entry;
             }
 
             if (!string.IsNullOrEmpty(_options.OnlyExts))
             {
                 return from entry in entries
-                    where _onlyExtArray.Any(s => entry.FullPath.EndsWith(s, StringComparison.OrdinalIgnoreCase))
-                    select entry;
+                       where _onlyExtArray.Any(s => entry.FullPath.EndsWith(s, StringComparison.OrdinalIgnoreCase))
+                       select entry;
             }
 
             return entries;
@@ -264,6 +278,12 @@ namespace RePKG.Command
             var filePathWithoutExtension = _options.SingleDir
                 ? Path.Combine(outputDirectory, entry.Name)
                 : Path.Combine(outputDirectory, entry.DirectoryPath, entry.Name);
+
+            // 如果开启了 OnlySaveImages，需要处理文件重名问题
+            if (_options.OnlySaveImages)
+            {
+                filePathWithoutExtension = outputDirectory;
+            }
 
             var filePath = filePathWithoutExtension + entry.Extension;
 
@@ -370,15 +390,27 @@ namespace RePKG.Command
 
             return null;
         }
-        
+
         private static void ConvertToImageAndSave(ITex tex, string path, bool overwrite)
         {
             var format = _texToImageConverter.GetConvertedFormat(tex);
-            var outputPath = $"{path}.{format.GetFileExtension()}";
+            var ext=format.GetFileExtension();
+            var outputPath = $"{path}.{ext}";
+
+            // 如果 OnlySaveImages，需要处理文件重名问题
+            if (_options.OnlySaveImages)
+            {
+                int counter = 0;
+                while (File.Exists(outputPath))
+                {
+                    counter++;
+                    outputPath = $"{path}_{counter}.{ext}";
+                }
+            }
 
             if (!overwrite && File.Exists(outputPath))
                 return;
-            
+
             var resultImage = _texToImageConverter.ConvertToImage(tex);
 
             File.WriteAllBytes(outputPath, resultImage.Bytes);
