@@ -6,21 +6,17 @@
         <Version>0.4.0</Version>
         <Copyright>Copyright © NotScuffed 2025</Copyright>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\RePKG.Application\RePKG.Application.csproj" />
         <ProjectReference Include="..\RePKG.Core\RePKG.Core.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="CommandLineParser" Version="2.9.1" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Reference Include="Microsoft.CSharp" />
-    </ItemGroup>
 
     <ItemGroup>
-        <None Include="$(ProjectDir)/../THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+      <Reference Include="Microsoft.CSharp" />
     </ItemGroup>
 </Project>
