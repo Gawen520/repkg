@@ -35,19 +35,36 @@
 ```
 
 ### 示例
-简单地提取 PKG 并将 TEX 条目转换为图像到当前目录中创建的 output 文件夹
-```
-repkg extract E:\Games\steamapps\workshop\content\123\scene.pkg
-```
-在指定目录的子文件夹中查找 PKG 文件，并在输出目录中创建 Wallpaper Engine 项目
-```
-repkg extract -c E:\Games\steamapps\workshop\content\123
-```
-在指定目录的子文件夹中查找 PKG 文件，仅将 TEX 条目转换为 png，然后将它们放在 ./output 中，忽略它们在 PKG 中的路径：
-```
-repkg extract -e tex -s -o ./output E:\Games\steamapps\workshop\content\123
-```
-将特定文件夹中的所有 TEX 文件转换为图像
-```
-repkg extract -t -s E:\path\to\dir\with\tex\files
-```
+1. 解压 PKG，默认将 TEX 转换为图像，默认保存到同目录下的 output 文件夹：
+
+   ```
+   repkg.exe extract X:\Downloads\2320649746\scene.pkg
+   ```
+
+2. 在指定目录的所有子文件夹中查找 PKG 文件，并在输出目录中创建 Wallpaper Engine 项目：
+
+   ```
+   repkg.exe extract -r -c X:\Downloads
+   ```
+
+3. 在指定目录的子文件夹中查找 PKG 文件，将 TEX 条目转换为 png，并忽略它们在 PKG 中的路径：
+
+   ```
+   repkg.exe extract -e tex -s X:\Downloads
+   ```
+
+4. 将特定文件夹中的所有 TEX 文件转换为图像：
+
+   ```
+   repkg.exe extract -t -s X:\Downloads
+   ```
+
+5. 在指定目录的所有子文件夹中查找 PKG 文件，仅提取所有图片，忽略它们原本的路径，保存在输出目录：
+
+   ``````
+   repkg.exe extract --osi -n X:\Downloads
+   ``````
+
+   
+
+   
